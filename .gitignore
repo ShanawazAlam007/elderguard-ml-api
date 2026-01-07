@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.env
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDEs
+.idea/
+*.iml
+.DS_Store
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Virtual Environment
+.venv/
+
+# Model files (already in app/, but good to be explicit for root)
+# model.pkl
+# vectorizer.pkl
