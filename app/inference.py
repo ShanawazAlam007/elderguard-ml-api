@@ -2,6 +2,7 @@ import joblib
 import numpy as np
 import re
 import os
+from rules import apply_rules
 
 # Load the pre-trained model and vectorizer
 # Ensure these paths are correct relative to where app.py will be run
@@ -50,6 +51,12 @@ def predict_scam(message: str):
     """
     original_message = message
     preprocessed_message = preprocess_message(original_message)
+
+    # Apply rule-based overrides from `rules.py` (greetings, genuine phrases, short-message rules)
+    rule_result = apply_rules(original_message)
+    if rule_result is not None:
+        label, conf = rule_result
+        return label, round(float(conf), 2), f'Classified as {label} by rule-based override.'
 
     # --- Rule-augmented Logic ---
 
