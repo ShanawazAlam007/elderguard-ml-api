@@ -65,7 +65,8 @@ def apply_rules(text: str) -> tuple[str, float] | None:
     Applies rule-based overrides to the input text.
     Returns (label, confidence) if a rule is triggered, otherwise None.
     """
-    normalized_text = text.lower().strip()
+    # Normalize input the same way stored phrases are normalized
+    normalized_text = normalize_text(text)
 
     # Rule-based override: Greetings
     if normalized_text in GREETINGS:
