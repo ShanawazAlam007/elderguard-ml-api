@@ -21,7 +21,18 @@ except FileNotFoundError as e:
     raise SystemExit("Required model files not found. Exiting.") from e
 
 # Define greeting words for the override rule
-GREETINGS = {'hi', 'hello', 'hii', 'hey', 'hi there', 'hello there', 'good morning', 'good afternoon', 'good evening'}
+GREETINGS = {
+    'hi', 'hello', 'hii', 'hey', 'helo', 'heyy', 'hellooo', 'hiiii',
+    'good morning', 'good afternoon', 'good evening', 'good night',
+    'morning', 'afternoon', 'evening',
+    'hi there', 'hello there', 'hey there',
+    'how are you', 'how r u', 'how r you',
+    'hi good morning', 'hello good morning', 'hey good morning',
+    'hi good afternoon', 'hello good afternoon', 'hey good afternoon',
+    'hi good evening', 'hello good evening', 'hey good evening',
+    'hii good morning', 'hii good afternoon', 'hii good evening',
+    'good morning how are you', 'good afternoon how are you', 'good evening how are you'
+}
 
 def preprocess_message(message):
     """

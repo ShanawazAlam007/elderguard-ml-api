@@ -4,8 +4,22 @@ import re
 
 # Raw phrase lists (readable forms). We'll normalize them below so matching
 # behavior follows the same preprocessing used in inference.
-RAW_GREETINGS = {"hi", "hello", "hii", "helo", "hey", "how are you", "ok", "okay", "thanks", "thank you", "how are you?", "how are you",
-                 "Hi How are you", "Hello How are you", "Hey How are you"}
+RAW_GREETINGS = {
+    "hi", "hello", "hii", "helo", "hey", "heyy", "helo", "hellooo", "hiiii",
+    "good morning", "good afternoon", "good evening", "good night",
+    "morning", "afternoon", "evening", 
+    "how are you", "how are you?", "how r u", "how r you",
+    "ok", "okay", "thanks", "thank you", "thank u", "thx", "ty",
+    "hi how are you", "hello how are you", "hey how are you",
+    "hi good morning", "hello good morning", "hey good morning",
+    "hi good afternoon", "hello good afternoon", "hey good afternoon",
+    "hi good evening", "hello good evening", "hey good evening",
+    "hii good morning", "hii good afternoon", "hii good evening",
+    "good morning how are you", "good afternoon how are you", "good evening how are you",
+    "hi there", "hello there", "hey there",
+    "whats up", "what's up", "wassup", "sup",
+    "nice to meet you", "pleased to meet you"
+}
 
 MIN_SAFE_LENGTH = 15  # Messages shorter than this are less likely to be complex scams
 
@@ -60,6 +74,14 @@ def normalize_text(text: str) -> str:
 GREETINGS = {normalize_text(g) for g in RAW_GREETINGS}
 GENUINE_MESSAGES = {normalize_text(p) for p in RAW_GENUINE_MESSAGES}
 
+# Common scam keywords that should not be classified as SAFE even if short
+SCAM_KEYWORDS = {
+    "otp", "verify", "urgent", "blocked", "suspended", "expired",
+    "click", "link", "prize", "won", "winner", "lottery", "claim",
+    "account", "bank", "card", "cvv", "pin", "password",
+    "reward", "free", "congratulations", "confirm", "update"
+}
+
 def apply_rules(text: str) -> tuple[str, float] | None:
     """
     Applies rule-based overrides to the input text.
@@ -68,8 +90,16 @@ def apply_rules(text: str) -> tuple[str, float] | None:
     # Normalize input the same way stored phrases are normalized
     normalized_text = normalize_text(text)
 
-    # Rule-based override: Greetings
+    # Rule-based override: Greetings (checked first for highest priority)
     if normalized_text in GREETINGS:
+        return "SAFE", 0.99
+    
+    # Check if the message contains greeting words combined with other greetings
+    # This handles cases like "hi good morning" even if not in exact list
+    words = normalized_text.split()
+    greeting_words = {"hi", "hii", "hello", "hey", "morning", "afternoon", "evening", "good", 
+                      "night", "how", "are", "you", "r", "u", "there"}
+    if len(words) <= 6 and all(word in greeting_words for word in words):
         return "SAFE", 0.99
 
     # Rule-based override: Common genuine messages
@@ -80,10 +110,12 @@ def apply_rules(text: str) -> tuple[str, float] | None:
 
     # Rule-based override: Single-word or very short messages
     # This rule is for non-greeting short messages, e.g., "cool", "nope", "yeah"
-    # Or messages that are too short to be meaningful scams
+    # But exclude messages with scam keywords
     if len(normalized_text.split()) <= 3 or len(normalized_text) < MIN_SAFE_LENGTH:
-        # Check if it's potentially a scam based on common scam keywords (optional, for more robustness)
-        # For now, default short messages to SAFE
+        # Check if it contains scam keywords
+        if any(keyword in normalized_text for keyword in SCAM_KEYWORDS):
+            return None  # Let the model decide
+        # Otherwise, classify as SAFE
         return "SAFE", 0.98
 
     return None
