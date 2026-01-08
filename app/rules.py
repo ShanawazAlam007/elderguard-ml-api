@@ -1,6 +1,6 @@
 # scam_text_api/app/rules.py
 
-GREETINGS = {"hi", "hello", "hii", "helo", "hey", "how are you", "ok", "okay", "thanks", "thank you","how are you?"}
+GREETINGS = {"hi", "hello", "hii", "helo", "hey", "how are you", "ok", "okay", "thanks", "thank you","how are you?","how are you"}
 MIN_SAFE_LENGTH = 15  # Messages shorter than this are less likely to be complex scams
 
 def apply_rules(text: str) -> tuple[str, float] | None:
